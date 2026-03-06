@@ -1,34 +1,76 @@
-let playlist=[]
-let index=0
-let audio=document.getElementById("audio")
+let playlist = []
+let currentIndex = 0
 
+let audio = document.getElementById("audio")
+
+// LOAD TRENDING SONGS DI HALAMAN UTAMA
+async function loadHome(){
+
+try{
+
+let res = await fetch("https://yt-music-api.herokuapp.com/api/yt/trending")
+
+let data = await res.json()
+
+playlist = data
+
+let trending = document.getElementById("trending")
+
+trending.innerHTML = ""
+
+data.forEach((song,i)=>{
+
+trending.innerHTML += `
+
+<div class="card" onclick="playSong(${i})">
+
+<img src="${song.thumbnail}">
+
+<p>${song.name}</p>
+
+</div>
+`
+
+})
+
+}catch(err){
+
+console.log("Error load trending:",err)
+
+}
+
+}
+
+// SEARCH MUSIC
 async function searchMusic(){
 
-let q=document.getElementById("search").value
+let q = document.getElementById("search").value
 
-if(q.length<2) return
+if(q.length < 2) return
 
-let res=await fetch(`https://ytmusic-api.vercel.app/search?q=${q}`)
+try{
 
-let data=await res.json()
+let res = await fetch(`https://yt-music-api.herokuapp.com/api/yt/search/${q}`)
 
-playlist=data.data
+let data = await res.json()
 
-let results=document.getElementById("results")
+playlist = data
 
-results.innerHTML=""
+let results = document.getElementById("results")
 
-data.data.forEach((song,i)=>{
+results.innerHTML = ""
 
-results.innerHTML+=`
+data.forEach((song,i)=>{
 
-<div class="song" onclick="play(${i})">
+results.innerHTML += `
+
+<div class="song" onclick="playSong(${i})">
 
 <img src="${song.thumbnail}">
 
 <div>
 
-<div>${song.title}</div>
+<div>${song.name}</div>
 <div>${song.artist}</div>
 
 </div>
@@ -39,44 +81,62 @@ results.innerHTML+=`
 
 })
 
+}catch(err){
+
+console.log("Search error:",err)
+
 }
 
-function play(i){
+}
 
-index=i
+// PLAY SONG
+function playSong(i){
 
-let song=playlist[i]
+currentIndex = i
 
-document.getElementById("title").innerText=song.title
-document.getElementById("artist").innerText=song.artist
-document.getElementById("cover").src=song.thumbnail
+let song = playlist[i]
 
-audio.src=`https://youtube.com/watch?v=${song.videoId}`
+document.getElementById("title").innerText = song.name
+document.getElementById("artist").innerText = song.artist
+document.getElementById("cover").src = song.thumbnail
+
+audio.src = song.url
 
 audio.play()
 
 }
 
+// NEXT SONG
 function next(){
 
-index++
+currentIndex++
 
-if(index>=playlist.length) index=0
+if(currentIndex >= playlist.length){
 
-play(index)
+currentIndex = 0
 
 }
 
+playSong(currentIndex)
+
+}
+
+// PREVIOUS SONG
 function prev(){
 
-index--
+currentIndex--
 
-if(index<0) index=playlist.length-1
+if(currentIndex < 0){
 
-play(index)
+currentIndex = playlist.length - 1
 
 }
 
+playSong(currentIndex)
+
+}
+
+// PLAY / PAUSE
 function toggle(){
 
 if(audio.paused){
@@ -91,8 +151,12 @@ audio.pause()
 
 }
 
-audio.onended=()=>{
+// AUTO NEXT SONG
+audio.addEventListener("ended",()=>{
 
 next()
 
-}
+})
+
+// LOAD TRENDING SAAT APP DIBUKA
+loadHome()
