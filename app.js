@@ -1,56 +1,20 @@
 let playlist = []
 let currentIndex = 0
 
-let audio = document.getElementById("audio")
+const audio = document.getElementById("audio")
 
-// LOAD TRENDING SONGS DI HALAMAN UTAMA
-async function loadHome(){
-
-try{
-
-let res = await fetch("https://yt-music-api.herokuapp.com/api/yt/trending")
-
-let data = await res.json()
-
-playlist = data
-
-let trending = document.getElementById("trending")
-
-trending.innerHTML = ""
-
-data.forEach((song,i)=>{
-
-trending.innerHTML += `
-
-<div class="card" onclick="playSong(${i})">
-
-<img src="${song.thumbnail}">
-
-<p>${song.name}</p>
-
-</div>
-`
-
-})
-
-}catch(err){
-
-console.log("Error load trending:",err)
-
-}
-
-}
-
-// SEARCH MUSIC
+// SEARCH MUSIC FROM YOUTUBE
 async function searchMusic(){
 
 let q = document.getElementById("search").value
 
 if(q.length < 2) return
 
+let url = `https://ytsearch.vercel.app/api/search?q=${q}`
+
 try{
 
-let res = await fetch(`https://yt-music-api.herokuapp.com/api/yt/search/${q}`)
+let res = await fetch(url)
 
 let data = await res.json()
 
@@ -70,8 +34,8 @@ results.innerHTML += `
 
 <div>
 
-<div>${song.name}</div>
-<div>${song.artist}</div>
+<div>${song.title}</div>
+<div>${song.channel}</div>
 
 </div>
 
@@ -81,9 +45,9 @@ results.innerHTML += `
 
 })
 
-}catch(err){
+}catch(e){
 
-console.log("Search error:",err)
+console.log("Search error",e)
 
 }
 
@@ -96,11 +60,11 @@ currentIndex = i
 
 let song = playlist[i]
 
-document.getElementById("title").innerText = song.name
-document.getElementById("artist").innerText = song.artist
+document.getElementById("title").innerText = song.title
+document.getElementById("artist").innerText = song.channel
 document.getElementById("cover").src = song.thumbnail
 
-audio.src = song.url
+audio.src = `https://youtube.com/watch?v=${song.videoId}`
 
 audio.play()
 
@@ -157,6 +121,3 @@ audio.addEventListener("ended",()=>{
 next()
 
 })
-
-// LOAD TRENDING SAAT APP DIBUKA
-loadHome()
