@@ -1,84 +1,98 @@
 let playlist=[]
-let current=0
+let index=0
+let audio=document.getElementById("audio")
 
 async function searchMusic(){
 
 let q=document.getElementById("search").value
 
+if(q.length<2) return
+
 let res=await fetch(`https://ytmusic-api.vercel.app/search?q=${q}`)
 
 let data=await res.json()
+
+playlist=data.data
 
 let results=document.getElementById("results")
 
 results.innerHTML=""
 
-playlist=data.data
-
 data.data.forEach((song,i)=>{
 
 results.innerHTML+=`
-<div class="song">
+
+<div class="song" onclick="play(${i})">
+
 <img src="${song.thumbnail}">
+
 <div>
-${song.title}<br>
-${song.artist}
+
+<div>${song.title}</div>
+<div>${song.artist}</div>
+
 </div>
 
-<button onclick="playSong(${i})">Play</button>
 </div>
+
 `
 
 })
 
 }
 
-function playSong(i){
+function play(i){
 
-current=i
+index=i
 
 let song=playlist[i]
 
-document.getElementById("songTitle").innerText=song.title
-
+document.getElementById("title").innerText=song.title
+document.getElementById("artist").innerText=song.artist
 document.getElementById("cover").src=song.thumbnail
 
-let player=document.getElementById("player")
+audio.src=`https://youtube.com/watch?v=${song.videoId}`
 
-player.src=`https://youtube.com/watch?v=${song.videoId}`
-
-player.play()
+audio.play()
 
 }
 
-function nextSong(){
+function next(){
 
-current++
+index++
 
-playSong(current)
+if(index>=playlist.length) index=0
 
-}
-
-function prevSong(){
-
-current--
-
-playSong(current)
+play(index)
 
 }
 
-function togglePlay(){
+function prev(){
 
-let player=document.getElementById("player")
+index--
 
-if(player.paused){
+if(index<0) index=playlist.length-1
 
-player.play()
+play(index)
+
+}
+
+function toggle(){
+
+if(audio.paused){
+
+audio.play()
 
 }else{
 
-player.pause()
+audio.pause()
 
 }
+
+}
+
+audio.onended=()=>{
+
+next()
 
 }
