@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Music</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+
+<header>
+<h2>My Music</h2>
+<input type="text" id="search" placeholder="Search music...">
+<button onclick="searchMusic()">Search</button>
+</header>
+
+<div id="home"></div>
+<div id="results"></div>
+
+<div id="playerBar">
+<img id="cover">
+<div id="songTitle"></div>
+
+<button onclick="prevSong()">⏮</button>
+<button onclick="togglePlay()">▶️</button>
+<button onclick="nextSong()">⏭</button>
+
+</div>
+
+<audio id="player"></audio>
+
+<script src="app.js"></script>
+</body>
+</html>
